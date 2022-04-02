@@ -16832,504 +16832,507 @@ EXT_C int digHoloRunBatchFromConfigFile(char* filename)
 
 			while (std::getline(configFile, line) && !errorCode)
 			{
-				if (line[line.length() - 1] == '\r')
+				if (line.length() > 0)
 				{
-					line[line.length() - 1] = 0;
-				}
-				std::istringstream iline;
-				iline.str(line);
+					if (line[line.length() - 1] == '\r')
+					{
+						line[line.length() - 1] = 0;
+					}
+					std::istringstream iline;
+					iline.str(line);
 
-				std::string parameterName;
-				std::getline(iline, parameterName, '	');
-				const char* pName = parameterName.c_str();
+					std::string parameterName;
+					std::getline(iline, parameterName, '	');
+					const char* pName = parameterName.c_str();
 
-				std::vector<std::string> args;
-				std::string argValue;
+					std::vector<std::string> args;
+					std::string argValue;
 
-				while (std::getline(iline, argValue, '	'))
-				{
-					args.push_back(argValue);
-				}
-				const size_t argCount = args.size();
+					while (std::getline(iline, argValue, '	'))
+					{
+						args.push_back(argValue);
+					}
+					const size_t argCount = args.size();
 
-				if (!strcmp("FrameBufferFilename", pName))
-				{
-					
+					if (!strcmp("FrameBufferFilename", pName))
+					{
+
+
+						if (argCount > 0)
+						{
+							std::string value = args[0];
+							int errorCode = digHoloSetFrameBufferFromFile(handleIdx, value.c_str());
+							if (errorCode != DIGHOLO_ERROR_SUCCESS)
+							{
+								std::cout << "Fatal error. Aborting.\n\r";
+								return errorCode;
+							}
+						}
+						else
+						{
+							std::cout << "No file supplied. Generating test frames.\n\r";
+							doTestFrames = true;
+						}
+						//	goto NEXTLINE;
+					}
 
 					if (argCount > 0)
 					{
-						std::string value = args[0];
-						int errorCode = digHoloSetFrameBufferFromFile(handleIdx, value.c_str());
-						if (errorCode != DIGHOLO_ERROR_SUCCESS)
+						try
 						{
-							std::cout << "Fatal error. Aborting.\n\r";
-							return errorCode;
+
+							if (!strcmp("FrameWidth", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetFrameWidth(handleIdx, value);
+								goto NEXTLINE;
+							}
+							if (!strcmp("FrameHeight", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetFrameHeight(handleIdx, value);
+								goto NEXTLINE;
+							}
+							if (!strcmp("BatchCount", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetBatchCount(handleIdx, value);
+								goto NEXTLINE;
+							}
+							if (!strcmp("PolCount", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetPolCount(handleIdx, value);
+								goto NEXTLINE;
+							}
+							if (!strcmp("ConsoleFilename", pName))
+							{
+								std::string value = args[0];
+								consoleFilename = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("Verbosity", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetVerbosity(handleIdx, value);
+								goto NEXTLINE;
+							}
+							if (!strcmp("OutputFilenameSummary", pName))
+							{
+								std::string value = args[0];
+								OutputFilenameSummary = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("OutputFilenameCoefs", pName))
+							{
+								std::string value = args[0];
+								OutputFilenameCoefs = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("OutputFilenameFields", pName))
+							{
+								std::string value = args[0];
+								OutputFilenameFields = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("OutputFilenameBasis", pName))
+							{
+								std::string value = args[0];
+								OutputFilenameBasis = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("OutputFilenameXaxis", pName))
+							{
+								std::string value = args[0];
+								OutputFilenameXaxis = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("OutputFilenameYaxis", pName))
+							{
+								std::string value = args[0];
+								OutputFilenameYaxis = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("OutputFilenameRefCalibration", pName))
+							{
+								std::string value = args[0];
+								OutputFilenameCalibration = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("OutputFilenameViewport", pName))
+							{
+								std::string value = args[0];
+								OutputFilenameViewport = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("ThreadCount", pName))
+							{
+								int value = stoi(args[0]);
+								if (value <= 0)
+								{
+									doThreadDiagnostic = 1;
+								}
+								digHoloConfigSetThreadCount(handleIdx, value);
+								goto NEXTLINE;
+							}
+							if (!strcmp("Benchmark", pName))
+							{
+								float value = stof(args[0]);
+								doBenchmark = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("Debug", pName))
+							{
+								int value = stoi(args[0]);
+								doDebug = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("FourierWindowRadius", pName))
+							{
+								float value = stof(args[0]);
+								digHoloConfigSetFourierWindowRadius(handleIdx, value);
+								goto NEXTLINE;
+							}
+							if (!strcmp("BeamCentreX", pName))
+							{
+								for (int argIdx = 0; argIdx < argCount; argIdx++)
+								{
+									float value = stof(args[argIdx]);
+									centreSpecified = centreSpecified | (value != 0);
+									digHoloConfigSetBeamCentre(handleIdx, 0, argIdx, value);
+								}
+								goto NEXTLINE;
+							}
+							if (!strcmp("BeamCentreY", pName))
+							{
+								for (int argIdx = 0; argIdx < argCount; argIdx++)
+								{
+									float value = stof(args[argIdx]);
+									centreSpecified = centreSpecified | (value != 0);
+									digHoloConfigSetBeamCentre(handleIdx, 1, argIdx, value);
+								}
+								goto NEXTLINE;
+							}
+							if (!strcmp("TiltX", pName))
+							{
+								for (int argIdx = 0; argIdx < argCount; argIdx++)
+								{
+									float value = stof(args[argIdx]);
+									tiltSpecified = tiltSpecified | (value != 0);
+									digHoloConfigSetTilt(handleIdx, 0, argIdx, value);
+								}
+								goto NEXTLINE;
+							}
+							if (!strcmp("TiltY", pName))
+							{
+								for (int argIdx = 0; argIdx < argCount; argIdx++)
+								{
+									float value = stof(args[argIdx]);
+									tiltSpecified = tiltSpecified | (value != 0);
+									digHoloConfigSetTilt(handleIdx, 1, argIdx, value);
+								}
+								goto NEXTLINE;
+							}
+
+							if (!strcmp("Defocus", pName))
+							{
+								for (int argIdx = 0; argIdx < argCount; argIdx++)
+								{
+									float value = stof(args[argIdx]);
+									defocusSpecified = defocusSpecified || value != 0;
+									digHoloConfigSetDefocus(handleIdx, argIdx, value);
+								}
+								goto NEXTLINE;
+							}
+							if (!strcmp("PixelSize", pName) | !strcmp("FramePixelSize", pName))
+							{
+								float value = stof(args[0]);
+								digHoloConfigSetFramePixelSize(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("PolLockTilt", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetPolLockTilt(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("PolLockDefocus", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetPolLockDefocus(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("PolLockBasisWaist", pName) || !strcmp("PolLockWaist", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetPolLockBasisWaist(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("fftWindowSizeX", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetfftWindowSizeX(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("fftWindowSizeY", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetfftWindowSizeY(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("FFTWPlanMode", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetFFTWPlanMode(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("FFTWWisdomFilename", pName))
+							{
+								std::string value = args[0];
+								digHoloFFTWWisdomFilename(value.c_str());
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("IFFTResolutionMode", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetIFFTResolutionMode(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("WavelengthCentre", pName))
+							{
+								float value = stof(args[0]);
+								digHoloConfigSetWavelengthCentre(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("WavelengthCount", pName))
+							{
+								wavelengthCount = stoi(args[0]);
+								goto NEXTLINE;
+							}
+							if (!strcmp("WavelengthStart", pName))
+							{
+								wavelengthStart = stof(args[0]);
+								goto NEXTLINE;
+							}
+							if (!strcmp("WavelengthStop", pName))
+							{
+								wavelengthStop = stof(args[0]);
+								goto NEXTLINE;
+							}
+							if (!strcmp("WavelengthOrdering", pName))
+							{
+								for (int argIdx = 0; argIdx < argCount; argIdx++)
+								{
+									int value = stoi(args[argIdx]);
+									digHoloConfigSetWavelengthOrdering(handleIdx, argIdx, value);
+								}
+								goto NEXTLINE;
+							}
+
+
+							if (!strcmp("MaxMG", pName) || !strcmp("BasisGroupCount", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetBasisGroupCount(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("BasisType", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetBasisType(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("Waist", pName) || !strcmp("BasisWaist", pName))
+							{
+								for (int argIdx = 0; argIdx < argCount; argIdx++)
+								{
+									float value = stof(args[argIdx]);
+									waistSpecified = waistSpecified | (value != 0);
+									digHoloConfigSetBasisWaist(handleIdx, argIdx, value);
+								}
+								//If less waist number were specified than polarisations
+								int polCount = digHoloConfigGetPolCount(handleIdx);
+								for (int polIdx = (int)argCount; polIdx < polCount; polIdx++)
+								{
+									float value = stof(args[argCount - 1]);
+									digHoloConfigSetBasisWaist(handleIdx, polIdx, value);
+								}
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("BatchAvgCount", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetBatchAvgCount(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("BatchAvgMode", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetBatchAvgMode(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignCentre", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignBeamCentre(handleIdx, value);
+								doAutoAlign = doAutoAlign | value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignDefocus", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignDefocus(handleIdx, value);
+								doAutoAlign = doAutoAlign | value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignTilt", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignTilt(handleIdx, value);
+								doAutoAlign = doAutoAlign | value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignWaist", pName) || !strcmp("AutoAlignBasisWaist", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignBasisWaist(handleIdx, value);
+								doAutoAlign = doAutoAlign | value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignFourierWindowRadius", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignFourierWindowRadius(handleIdx, value);
+								doAutoAlign = doAutoAlign | value;
+								goto NEXTLINE;
+							}
+
+							if (!strcmp("AutoAlignTol", pName))
+							{
+								float value = stof(args[0]);
+								digHoloConfigSetAutoAlignTol(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignPolIndependence", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignPolIndependence(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignBasisMulConjTrans", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignBasisMulConjTrans(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignMode", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignMode(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("AutoAlignGoalIdx", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetAutoAlignGoalIdx(handleIdx, value);
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("BasisCustomFilename", pName))
+							{
+								std::string value = args[0];
+								BasisFilename = value;
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("BasisCustomModeCountIn", pName))
+							{
+								int value = stoi(args[0]);
+								BasisCustomModeCountIn = value;
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("BasisCustomModeCountOut", pName))
+							{
+								int value = stoi(args[0]);
+								BasisCustomModeCountOut = value;
+
+								goto NEXTLINE;
+							}
+							if (!strcmp("RefCalibrationFilename", pName))
+							{
+								std::string value = args[0];
+								CalibrationFilename = value;
+								CalibrationExists = true;
+								goto NEXTLINE;
+							}
+
+							if (!strcmp("BatchCalibrationFilename", pName))
+							{
+								std::string value = args[0];
+								BatchCalibrationFilename = value;
+								BatchCalibrationExists = true;
+								goto NEXTLINE;
+							}
+
+							if (!strcmp("BatchCalibrationPolCount", pName))
+							{
+								int value = stoi(args[0]);
+								BatchCalibrationPolCount = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("BatchCalibrationBatchCount", pName))
+							{
+								int value = stoi(args[0]);
+								BatchCalibrationBatchCount = value;
+								goto NEXTLINE;
+							}
+							if (!strcmp("FillFactorCorrection", pName))
+							{
+								int value = stoi(args[0]);
+								digHoloConfigSetFillFactorCorrectionEnabled(handleIdx, value);
+								goto NEXTLINE;
+							}
+							if (!strcmp("Viewport", pName))
+							{
+								allocate1D(argCount, doViewport);
+								for (int argIdx = 0; argIdx < argCount; argIdx++)
+								{
+									int value = stoi(args[argIdx]);
+									doViewport[argIdx] = value;
+								}
+								doViewportCount = (int)argCount;
+
+								goto NEXTLINE;
+							}
+						}
+						catch (const std::exception& ex)
+						{
+							std::cout << ex.what() << "\n";
 						}
 					}
-					else
-					{
-						std::cout << "No file supplied. Generating test frames.\n\r";
-						doTestFrames = true;
-					}
-				//	goto NEXTLINE;
+
+				NEXTLINE: {}
 				}
-
-				if (argCount > 0)
-				{
-					try
-					{
-
-						if (!strcmp("FrameWidth", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetFrameWidth(handleIdx, value);
-							goto NEXTLINE;
-						}
-						if (!strcmp("FrameHeight", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetFrameHeight(handleIdx, value);
-							goto NEXTLINE;
-						}
-						if (!strcmp("BatchCount", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetBatchCount(handleIdx, value);
-							goto NEXTLINE;
-						}
-						if (!strcmp("PolCount", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetPolCount(handleIdx, value);
-							goto NEXTLINE;
-						}
-						if (!strcmp("ConsoleFilename", pName))
-						{
-							std::string value = args[0];
-							consoleFilename = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("Verbosity", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetVerbosity(handleIdx, value);
-							goto NEXTLINE;
-						}
-						if (!strcmp("OutputFilenameSummary", pName))
-						{
-							std::string value = args[0];
-							OutputFilenameSummary = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("OutputFilenameCoefs", pName))
-						{
-							std::string value = args[0];
-							OutputFilenameCoefs = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("OutputFilenameFields", pName))
-						{
-							std::string value = args[0];
-							OutputFilenameFields = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("OutputFilenameBasis", pName))
-						{
-							std::string value = args[0];
-							OutputFilenameBasis = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("OutputFilenameXaxis", pName))
-						{
-							std::string value = args[0];
-							OutputFilenameXaxis = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("OutputFilenameYaxis", pName))
-						{
-							std::string value = args[0];
-							OutputFilenameYaxis = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("OutputFilenameRefCalibration", pName))
-						{
-							std::string value = args[0];
-							OutputFilenameCalibration = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("OutputFilenameViewport", pName))
-						{
-							std::string value = args[0];
-							OutputFilenameViewport = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("ThreadCount", pName))
-						{
-							int value = stoi(args[0]);
-							if (value <= 0)
-							{
-								doThreadDiagnostic = 1;
-							}
-							digHoloConfigSetThreadCount(handleIdx, value);
-							goto NEXTLINE;
-						}
-						if (!strcmp("Benchmark", pName))
-						{
-							float value = stof(args[0]);
-							doBenchmark = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("Debug", pName))
-						{
-							int value = stoi(args[0]);
-							doDebug = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("FourierWindowRadius", pName))
-						{
-							float value = stof(args[0]);
-							digHoloConfigSetFourierWindowRadius(handleIdx, value);
-							goto NEXTLINE;
-						}
-						if (!strcmp("BeamCentreX", pName))
-						{
-							for (int argIdx = 0; argIdx < argCount; argIdx++)
-							{
-								float value = stof(args[argIdx]);
-								centreSpecified = centreSpecified | (value != 0);
-								digHoloConfigSetBeamCentre(handleIdx, 0, argIdx, value);
-							}
-							goto NEXTLINE;
-						}
-						if (!strcmp("BeamCentreY", pName))
-						{
-							for (int argIdx = 0; argIdx < argCount; argIdx++)
-							{
-								float value = stof(args[argIdx]);
-								centreSpecified = centreSpecified | (value != 0);
-								digHoloConfigSetBeamCentre(handleIdx, 1, argIdx, value);
-							}
-							goto NEXTLINE;
-						}
-						if (!strcmp("TiltX", pName))
-						{
-							for (int argIdx = 0; argIdx < argCount; argIdx++)
-							{
-								float value = stof(args[argIdx]);
-								tiltSpecified = tiltSpecified | (value != 0);
-								digHoloConfigSetTilt(handleIdx, 0, argIdx, value);
-							}
-							goto NEXTLINE;
-						}
-						if (!strcmp("TiltY", pName))
-						{
-							for (int argIdx = 0; argIdx < argCount; argIdx++)
-							{
-								float value = stof(args[argIdx]);
-								tiltSpecified = tiltSpecified | (value != 0);
-								digHoloConfigSetTilt(handleIdx, 1, argIdx, value);
-							}
-							goto NEXTLINE;
-						}
-
-						if (!strcmp("Defocus", pName))
-						{
-							for (int argIdx = 0; argIdx < argCount; argIdx++)
-							{
-								float value = stof(args[argIdx]);
-								defocusSpecified = defocusSpecified || value != 0;
-								digHoloConfigSetDefocus(handleIdx, argIdx, value);
-							}
-							goto NEXTLINE;
-						}
-						if (!strcmp("PixelSize", pName) | !strcmp("FramePixelSize", pName))
-						{
-							float value = stof(args[0]);
-							digHoloConfigSetFramePixelSize(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("PolLockTilt", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetPolLockTilt(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("PolLockDefocus", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetPolLockDefocus(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("PolLockBasisWaist", pName) || !strcmp("PolLockWaist", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetPolLockBasisWaist(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("fftWindowSizeX", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetfftWindowSizeX(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("fftWindowSizeY", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetfftWindowSizeY(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("FFTWPlanMode", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetFFTWPlanMode(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("FFTWWisdomFilename", pName))
-						{
-							std::string value = args[0];
-							digHoloFFTWWisdomFilename(value.c_str());
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("IFFTResolutionMode", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetIFFTResolutionMode(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("WavelengthCentre", pName))
-						{
-							float value = stof(args[0]);
-							digHoloConfigSetWavelengthCentre(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("WavelengthCount", pName))
-						{
-							wavelengthCount = stoi(args[0]);
-							goto NEXTLINE;
-						}
-						if (!strcmp("WavelengthStart", pName))
-						{
-							wavelengthStart = stof(args[0]);
-							goto NEXTLINE;
-						}
-						if (!strcmp("WavelengthStop", pName))
-						{
-							wavelengthStop = stof(args[0]);
-							goto NEXTLINE;
-						}
-						if (!strcmp("WavelengthOrdering", pName))
-						{
-							for (int argIdx = 0; argIdx < argCount; argIdx++)
-							{
-								int value = stoi(args[argIdx]);
-								digHoloConfigSetWavelengthOrdering(handleIdx, argIdx,value);
-							}
-							goto NEXTLINE;
-						}
-						
-
-						if (!strcmp("MaxMG", pName) || !strcmp("BasisGroupCount", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetBasisGroupCount(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("BasisType", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetBasisType(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("Waist", pName) || !strcmp("BasisWaist", pName))
-						{
-							for (int argIdx = 0; argIdx < argCount; argIdx++)
-							{
-								float value = stof(args[argIdx]);
-								waistSpecified = waistSpecified | (value != 0);
-								digHoloConfigSetBasisWaist(handleIdx, argIdx, value);
-							}
-							//If less waist number were specified than polarisations
-							int polCount = digHoloConfigGetPolCount(handleIdx);
-							for (int polIdx = (int)argCount; polIdx < polCount; polIdx++)
-							{
-								float value = stof(args[argCount-1]);
-								digHoloConfigSetBasisWaist(handleIdx, polIdx, value);
-							}
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("BatchAvgCount", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetBatchAvgCount(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("BatchAvgMode", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetBatchAvgMode(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignCentre", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignBeamCentre(handleIdx, value);
-							doAutoAlign = doAutoAlign | value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignDefocus", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignDefocus(handleIdx, value);
-							doAutoAlign = doAutoAlign | value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignTilt", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignTilt(handleIdx, value);
-							doAutoAlign = doAutoAlign | value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignWaist", pName) || !strcmp("AutoAlignBasisWaist",pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignBasisWaist(handleIdx, value);
-							doAutoAlign = doAutoAlign | value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignFourierWindowRadius", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignFourierWindowRadius(handleIdx, value);
-							doAutoAlign = doAutoAlign | value;
-							goto NEXTLINE;
-						}
-
-						if (!strcmp("AutoAlignTol", pName))
-						{
-							float value = stof(args[0]);
-							digHoloConfigSetAutoAlignTol(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignPolIndependence", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignPolIndependence(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignBasisMulConjTrans", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignBasisMulConjTrans(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignMode", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignMode(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("AutoAlignGoalIdx", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetAutoAlignGoalIdx(handleIdx, value);
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("BasisCustomFilename", pName))
-						{
-							std::string value = args[0];
-							BasisFilename = value;
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("BasisCustomModeCountIn", pName))
-						{
-							int value = stoi(args[0]);
-							BasisCustomModeCountIn = value;
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("BasisCustomModeCountOut", pName))
-						{
-							int value = stoi(args[0]);
-							BasisCustomModeCountOut= value;
-
-							goto NEXTLINE;
-						}
-						if (!strcmp("RefCalibrationFilename", pName))
-						{
-							std::string value = args[0];
-							CalibrationFilename = value;
-							CalibrationExists = true;
-							goto NEXTLINE;
-						}
-
-						if (!strcmp("BatchCalibrationFilename", pName))
-						{
-							std::string value = args[0];
-							BatchCalibrationFilename = value;
-							BatchCalibrationExists = true;
-							goto NEXTLINE;
-						}
-
-						if (!strcmp("BatchCalibrationPolCount", pName))
-						{
-							int value = stoi(args[0]);
-							BatchCalibrationPolCount = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("BatchCalibrationBatchCount", pName))
-						{
-							int value = stoi(args[0]);
-							BatchCalibrationBatchCount = value;
-							goto NEXTLINE;
-						}
-						if (!strcmp("FillFactorCorrection", pName))
-						{
-							int value = stoi(args[0]);
-							digHoloConfigSetFillFactorCorrectionEnabled(handleIdx,value);
-							goto NEXTLINE;
-						}
-						if (!strcmp("Viewport", pName))
-						{
-							allocate1D(argCount, doViewport);
-							for (int argIdx = 0; argIdx < argCount; argIdx++)
-							{
-								int value = stoi(args[argIdx]);
-								doViewport[argIdx] = value;
-							}
-							doViewportCount = (int)argCount;
-							
-							goto NEXTLINE;
-						}
-					}
-					catch (const std::exception& ex)
-					{
-						std::cout << ex.what() << "\n";
-					}
-				}
-
-			NEXTLINE: {}
 			}//while new lines
 			configFile.close();
 			if (!errorCode)
