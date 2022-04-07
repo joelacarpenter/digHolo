@@ -1,4 +1,5 @@
-# digHolo
+# digHolo <img src="https://github.com/joelacarpenter/digHolo/blob/doc/DigHoloLogo_64x64.png" height="32" width="32"><br>
+
 High-speed library for off-axis digital holography and Hermite-Gaussian decomposition
 # User Guide
 If this library was useful to you, please cite this [User Guide](https://arxiv.org/abs/2204.02348) [arXiv:2204.02348]
