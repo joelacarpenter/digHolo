@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Carpenter"
+  given-names: "Joel"
+  orcid: "https://orcid.org/0000-0000-0000-0000"
+title: "digHolo : High-speed library for off-axis digital holography and Hermite-Gaussian decomposition"
+version: 1.0.0
+doi: 10.48550/arXiv.2204.02348
+date-released: 2021-04-01
+url: "https://arxiv.org/abs/2204.02348"
